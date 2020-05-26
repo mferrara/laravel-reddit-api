@@ -4,7 +4,7 @@ Using this package you can easily retrieve data from Reddit API.
 
 Laravel wrapper for https://github.com/rotorcowboy/Phapper
 
-Supports Laravel 5.x, 6.x
+Supports Laravel 5.x, 6.x, 7.x
 
 Here are a few examples of the provided methods:
 ```php
@@ -59,14 +59,14 @@ The following config file will be published in `config/reddit-api.php`
 return [
     'endpoint_standard' => 'https://www.reddit.com',
     'endpoint_oauth' => 'https://oauth.reddit.com',
-    
+
     'username' => '',
     'password' => '',
     'app_id' => '',
     'app_secret' => '',
-    
+
     'response_format' => 'STD', // STD | ARRAY
-    
+
     'scopes' => 'save,modposts,identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,submit,subscribe,vote,wikiedit,wikiread'
 ];
 ```
