@@ -4,7 +4,7 @@ Using this package you can easily retrieve data from Reddit API.
 
 Laravel wrapper for https://github.com/rotorcowboy/Phapper
 
-Supports Laravel 5.x, 6.x, 7.x
+Supports Laravel 5.x, 6.x, 7.x, 8.x, 9.x
 
 Here are a few examples of the provided methods:
 ```php
@@ -22,7 +22,7 @@ RedditAPI::search('Margot Robbie ', null, 'top', null, 'pics', 100);
 This package can be installed through Composer.
 
 ``` bash
-composer require codewizz/laravel-reddit-api
+composer require coliving/laravel-reddit-api
 ```
 
 You must install this service provider.
