@@ -2931,6 +2931,24 @@ class RedditAPI
     }
 
     /**
+     * Batch request to obtain account information (requires account "fullname" https://www.reddit.com/dev/api#fullnames)
+     * @param $account_fullnames
+     * @return object Response to API call containing user objects.
+     */
+    public function batchGetUser($account_fullnames)
+    {
+        if (is_array($account_fullnames)) {
+            $account_fullnames = implode(',', $account_fullnames);
+        }
+
+        $params = array(
+            'ids' => $account_fullnames
+        );
+
+        return $this->apiCall("/api/user_data_by_account_ids", 'GET', $params);
+    }
+
+    /**
      * Private method for obtaining a specific user's post and comment listings.
      * @param string $location One of 'overview', 'submitted', 'comments', 'upvoted', 'downvoted', 'hidden', 'saved', 'gilded'.
      * @param string $user Username of user for whom to retrieve records. Defaults to the current user.
