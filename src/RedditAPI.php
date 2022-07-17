@@ -16,11 +16,11 @@ class RedditAPI
     private $response_format;
     private $debug;
 
-    public function __construct($username, $password, $appID, $appSecret, $endpointStandard, $endpointOAuth, $responseFormat)
+    public function __construct($username, $password, $appID, $appSecret, $endpointStandard, $endpointOAuth, $responseFormat, $userAgent)
     {
-        $this->oauth2 = new RedditOAuth2($username, $password, $appID, $appSecret, '(CodeWizz 0.1)', $endpointStandard);
+        $this->oauth2 = new RedditOAuth2($username, $password, $appID, $appSecret, $userAgent, $endpointStandard);
         $this->ratelimiter = new RedditRateLimiter(true, 1);
-        $this->user_agent = '(CodeWizz 0.1)';
+        $this->user_agent = $userAgent;
         $this->basic_endpoint = $endpointStandard;
         $this->oauth_endpoint = $endpointOAuth;
         $this->response_format = $responseFormat;

@@ -26,7 +26,7 @@ class RedditAPIServiceProvider extends ServiceProvider
         $redditAPIConfig = config('reddit-api');
 
         $this->app->singleton('laravel-reddit-api', function () use($redditAPIConfig) {
-            return new RedditAPI($redditAPIConfig['username'], $redditAPIConfig['password'], $redditAPIConfig['app_id'], $redditAPIConfig['app_secret'], $redditAPIConfig['endpoint_standard'], $redditAPIConfig['endpoint_oauth'], $redditAPIConfig['response_format']);
+            return new RedditAPI($redditAPIConfig['username'], $redditAPIConfig['password'], $redditAPIConfig['app_id'], $redditAPIConfig['app_secret'], $redditAPIConfig['endpoint_standard'], $redditAPIConfig['endpoint_oauth'], $redditAPIConfig['response_format'], $redditAPIConfig['user_agent']);
         });
     }
 }
