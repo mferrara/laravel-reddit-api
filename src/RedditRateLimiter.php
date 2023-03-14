@@ -52,6 +52,9 @@ class RedditRateLimiter
         $wait_until = $this->last_request + ($this->interval * 10000);
         if ($this->enabled && $now < $wait_until) {
             usleep(($wait_until - $now) * 100);
+            if(class_exists('\Illuminate\Support\Facades\Log')) {
+                \Illuminate\Support\Facades\Log::debug('RedditAPI / RedditRateLimiter: Waiting for ' . ($wait_until - $now) . ' microseconds');
+            }
         }
         $this->last_request = microtime(true) * 10000;
     }
