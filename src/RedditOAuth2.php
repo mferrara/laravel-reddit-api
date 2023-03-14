@@ -54,9 +54,11 @@ class RedditOAuth2
         $options[CURLOPT_TIMEOUT] = 10;
         $options[CURLOPT_CUSTOMREQUEST] = 'POST';
         $options[CURLOPT_POSTFIELDS] = $params;
-        
+
         $response = null;
         $got_token = false;
+        $max_attempts = 3;
+        $attempts = 1;
         while (!$got_token) {
             $ch = curl_init($url);
             curl_setopt_array($ch, $options);
@@ -75,7 +77,12 @@ class RedditOAuth2
                 } else {
                     fwrite(STDERR, "WARNING: Request for reddit access token has failed. Check your connection.\n");
                     sleep(5);
+                    $attempts++;
                 }
+            }
+
+            if( ! $got_token && $attempts >= $max_attempts ) {
+                throw new RedditAuthenticationException("Failed to get reddit access token after $max_attempts attempts, check your internet connection and/or check reddit service status.", 3);
             }
         }
         $this->access_token = $response->access_token;
