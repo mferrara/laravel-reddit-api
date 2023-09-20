@@ -16,8 +16,10 @@ class RedditOAuth2
     private $app_secret;
     private $user_agent;
     private $endpoint;
+    private $cache_service;
+    private $cache_key;
 
-    public function __construct($username, $password, $app_id, $app_secret, $user_agent, $endpoint)
+    public function __construct($username, $password, $app_id, $app_secret, $user_agent, $endpoint, $cache_auth_token = true, $cache_driver = 'file')
     {
         $this->username = $username;
         $this->password = $password;
@@ -25,14 +27,37 @@ class RedditOAuth2
         $this->app_secret = $app_secret;
         $this->user_agent = $user_agent;
         $this->endpoint = $endpoint;
-        $this->requestAccessToken();
+        $this->cache_key = 'reddit_access_token_'.$this->app_id.time();
+        $this->cache_service = null;
+        if($cache_auth_token)
+            $this->cache_service = \Cache::driver($cache_driver);
+
+        // We're already making a call to getAccessToken on every apiCall, so we don't need to do it here
+        //$this->requestAccessToken();
     }
 
     public function getAccessToken()
     {
+        // Try to get token from the cache first
+        if($this->cache_service){
+            $cached_token = $this->cache_service->get($this->cache_key);
+            if ($cached_token) {
+                $this->access_token = $cached_token['access_token'];
+                $this->token_type = $cached_token['token_type'];
+                $this->expiration = $cached_token['expiration'];
+                $this->scope = $cached_token['scope'];
+
+                return [
+                    'access_token' => $this->access_token,
+                    'token_type' => $this->token_type,
+                ];
+            }
+        }
+
         if (!(isset($this->access_token) && isset($this->token_type) && time() < $this->expiration)) {
             $this->requestAccessToken();
         }
+
         return array(
             'access_token' => $this->access_token,
             'token_type' => $this->token_type
@@ -89,5 +114,15 @@ class RedditOAuth2
         $this->token_type = $response->token_type;
         $this->expiration = time() + $response->expires_in;
         $this->scope = $response->scope;
+
+        // Cache the token
+        if($this->cache_service){
+            $this->cache_service->put($this->cache_key, [
+                'access_token' => $this->access_token,
+                'token_type' => $this->token_type,
+                'expiration' => $this->expiration,
+                'scope' => $this->scope,
+            ], 60 * 60 * 24 * 14); // 14 days
+        }
     }
 }

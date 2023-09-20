@@ -9,6 +9,7 @@ class RedditAPI
 
     /** @var PhapperRateLimiter */
     public $ratelimiter;
+    public $cacheService;
     private $user_id;
     private $user_agent;
     private $basic_endpoint;
@@ -16,9 +17,9 @@ class RedditAPI
     private $response_format;
     private $debug;
 
-    public function __construct($username, $password, $appID, $appSecret, $endpointStandard, $endpointOAuth, $responseFormat, $userAgent, $rateLimited = true)
+    public function __construct($username, $password, $appID, $appSecret, $endpointStandard, $endpointOAuth, $responseFormat, $userAgent, $cacheAuthToken, $cacheDriver, $rateLimited = true)
     {
-        $this->oauth2 = new RedditOAuth2($username, $password, $appID, $appSecret, $userAgent, $endpointStandard);
+        $this->oauth2 = new RedditOAuth2($username, $password, $appID, $appSecret, $userAgent, $endpointStandard, $cacheAuthToken, $cacheDriver);
         $this->ratelimiter = new RedditRateLimiter($rateLimited, 0.6);
         $this->user_agent = $userAgent;
         $this->basic_endpoint = $endpointStandard;
