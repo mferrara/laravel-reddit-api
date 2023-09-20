@@ -3430,7 +3430,7 @@ class RedditAPI
 
             // Cache the rate-limit headers here.
             if (!empty($this->rate_limit_headers)) {
-                $this->cache_service->put('reddit_api_rate_limit_headers', $this->rate_limit_headers, 60);
+                $this->cache_service->put('reddit_api_rate_limit_headers', $this->rate_limit_headers, 60 * 60 * 24);
             }
 
             //Parse response
