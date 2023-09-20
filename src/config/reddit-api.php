@@ -19,6 +19,7 @@ return [
     'redirect_uri' => '',
 
     'rate_limited' => true,
+    'cache_rate_limiting_headers' => true,
 
     'cache_auth_token' => true,
     'cache_driver' => 'file',

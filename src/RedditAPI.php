@@ -9,15 +9,17 @@ class RedditAPI
 
     /** @var PhapperRateLimiter */
     public $ratelimiter;
-    public $cacheService;
     private $user_id;
     private $user_agent;
     private $basic_endpoint;
     private $oauth_endpoint;
     private $response_format;
     private $debug;
+    private $cache_service;
+    private $cache_rate_limiting_headers;
+    protected $rate_limit_headers;
 
-    public function __construct($username, $password, $appID, $appSecret, $endpointStandard, $endpointOAuth, $responseFormat, $userAgent, $cacheAuthToken, $cacheDriver, $rateLimited = true)
+    public function __construct($username, $password, $appID, $appSecret, $endpointStandard, $endpointOAuth, $responseFormat, $userAgent, $cacheAuthToken, $cacheDriver, $rateLimited, $cacheRateLimitingHeaders)
     {
         $this->oauth2 = new RedditOAuth2($username, $password, $appID, $appSecret, $userAgent, $endpointStandard, $cacheAuthToken, $cacheDriver);
         $this->ratelimiter = new RedditRateLimiter($rateLimited, 0.6);
@@ -26,6 +28,11 @@ class RedditAPI
         $this->oauth_endpoint = $endpointOAuth;
         $this->response_format = $responseFormat;
         $this->debug = false;
+        $this->cache_service = null;
+        $this->cache_rate_limiting_headers = $cacheRateLimitingHeaders;
+        if($cacheAuthToken || $cacheRateLimitingHeaders){
+            $this->cache_service = \Cache::driver($cacheDriver);
+        }
     }
 
     public function setDebug($debug)
@@ -3367,6 +3374,27 @@ class RedditAPI
         $url = $this->oauth_endpoint . $path;
         //Obtain access token for authentication
         $token = $this->oauth2->getAccessToken();
+
+        if($this->cache_rate_limiting_headers){
+            // Define a header function for cURL
+            $headerFunction = function ($ch, $headerLine) {
+                $rateLimitHeaders = [
+                    'X-Ratelimit-Remaining',
+                    'X-Ratelimit-Used',
+                    'X-Ratelimit-Reset'
+                ];
+                foreach ($rateLimitHeaders as $header) {
+                    if (stripos($headerLine, $header) !== false) {
+                        list($key, $value) = explode(": ", trim($headerLine));
+                        $this->rate_limit_headers[$key] = trim($value);
+                    }
+                }
+                return strlen($headerLine); // Needed by cURL
+            };
+
+            $options[CURLOPT_HEADERFUNCTION] = $headerFunction;
+        }
+
         //Prepare cURL options
         $options[CURLOPT_RETURNTRANSFER] = true;
         $options[CURLOPT_CONNECTTIMEOUT] = 10;
@@ -3399,6 +3427,12 @@ class RedditAPI
             //Send request and close connection
             $response_raw = curl_exec($ch);
             curl_close($ch);
+
+            // Cache the rate-limit headers here.
+            if (!empty($this->rate_limit_headers)) {
+                $this->cache_service->put('reddit_api_rate_limit_headers', $this->rate_limit_headers, 60);
+            }
+
             //Parse response
             $response = json_decode($response_raw);
             if ($json_error = json_last_error()) {
@@ -3412,7 +3446,7 @@ class RedditAPI
                 $needs_captcha = false;
             }
         } while ($needs_captcha);
-        
+
         if ($this->response_format == 'STD') {
             return $response;
         } else {

@@ -37,7 +37,8 @@ class RedditAPIServiceProvider extends ServiceProvider
                 $redditAPIConfig['user_agent'],
                 $redditAPIConfig['cache_auth_token'],
                 $redditAPIConfig['cache_driver'],
-                $redditAPIConfig['rate_limited'] ?? true,
+                $redditAPIConfig['rate_limited'],
+                $redditAPIConfig['cache_rate_limiting_headers'],
             );
         });
     }
