@@ -2,25 +2,27 @@
 
 namespace CodeWizz\RedditAPI;
 
+use Cache;
+
 class RedditAPI
 {
-    /** @var PhapperOAuth2 */
-    private $oauth2;
+    /** @var RedditOAuth2 */
+    private RedditOAuth2 $oauth2;
 
-    /** @var PhapperRateLimiter */
-    public $ratelimiter;
-    private $user_id;
-    private $user_agent;
-    private $basic_endpoint;
-    private $oauth_endpoint;
-    private $response_format;
-    private $debug;
+    /** @var RedditRateLimiter */
+    public RedditRateLimiter $ratelimiter;
+    private string $user_id;
+    private string $user_agent;
+    private string $basic_endpoint;
+    private string $oauth_endpoint;
+    private string $response_format;
+    private bool $debug;
     private $cache_service;
-    private $cache_rate_limiting_headers;
-    protected $rate_limit_headers;
-    private $rate_limit_headers_cache_key;
+    private bool $cache_rate_limiting_headers;
+    protected array $rate_limit_headers;
+    private string $rate_limit_headers_cache_key;
 
-    public function __construct($username, $password, $appID, $appSecret, $endpointStandard, $endpointOAuth, $responseFormat, $userAgent, $cacheAuthToken, $cacheDriver, $rateLimited, $cacheRateLimitingHeaders)
+    public function __construct(string $username, string $password, string $appID, string $appSecret, string $endpointStandard, string $endpointOAuth, string $responseFormat, string $userAgent, bool $cacheAuthToken, string $cacheDriver, bool $rateLimited, bool $cacheRateLimitingHeaders)
     {
         $this->oauth2 = new RedditOAuth2($username, $password, $appID, $appSecret, $userAgent, $endpointStandard, $cacheAuthToken, $cacheDriver);
         $this->ratelimiter = new RedditRateLimiter($rateLimited, 0.6);
@@ -32,7 +34,7 @@ class RedditAPI
         $this->cache_service = null;
         $this->cache_rate_limiting_headers = $cacheRateLimitingHeaders;
         if($cacheAuthToken || $cacheRateLimitingHeaders){
-            $this->cache_service = \Cache::driver($cacheDriver);
+            $this->cache_service = Cache::driver($cacheDriver);
             $this->rate_limit_headers_cache_key = 'reddit_api_rate_limit_headers'.$appID;
         }
     }
