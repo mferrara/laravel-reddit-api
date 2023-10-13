@@ -68,9 +68,10 @@ class RedditOAuth2
     {
         $url = "{$this->endpoint}/api/v1/access_token";
         $params = array(
-            'grant_type' => 'password',
-            'username' => $this->username,
-            'password' => $this->password
+            //'grant_type' => 'password',
+            //'username' => $this->username,
+            //'password' => $this->password,
+            'grant_type' => 'client_credentials',
         );
         $options[CURLOPT_USERAGENT] = $this->user_agent;
         $options[CURLOPT_USERPWD] = $this->app_id . ':' . $this->app_secret;
