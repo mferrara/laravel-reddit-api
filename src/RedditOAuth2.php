@@ -27,7 +27,7 @@ class RedditOAuth2
         $this->app_secret = $app_secret;
         $this->user_agent = $user_agent;
         $this->endpoint = $endpoint;
-        $this->cache_key = 'reddit_access_token_'.$this->app_id.time();
+        $this->cache_key = 'reddit_access_token_'.$this->app_id;
         $this->cache_service = null;
         if($cache_auth_token)
             $this->cache_service = \Cache::driver($cache_driver);
