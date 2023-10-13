@@ -3390,7 +3390,7 @@ class RedditAPI
                 foreach ($rateLimitHeaders as $header) {
                     if (stripos($headerLine, $header) !== false) {
                         list($key, $value) = explode(": ", trim($headerLine));
-                        $this->rate_limit_headers[$key] = trim($value);
+                        $this->rate_limit_headers[$key] = (int) trim($value);
                     }
                 }
                 return strlen($headerLine); // Needed by cURL
