@@ -18,6 +18,7 @@ class RedditAPI
     private $cache_service;
     private $cache_rate_limiting_headers;
     protected $rate_limit_headers;
+    private $rate_limit_headers_cache_key;
 
     public function __construct($username, $password, $appID, $appSecret, $endpointStandard, $endpointOAuth, $responseFormat, $userAgent, $cacheAuthToken, $cacheDriver, $rateLimited, $cacheRateLimitingHeaders)
     {
@@ -32,6 +33,7 @@ class RedditAPI
         $this->cache_rate_limiting_headers = $cacheRateLimitingHeaders;
         if($cacheAuthToken || $cacheRateLimitingHeaders){
             $this->cache_service = \Cache::driver($cacheDriver);
+            $this->rate_limit_headers_cache_key = 'reddit_api_rate_limit_headers'.$appID;
         }
     }
 
@@ -3431,7 +3433,7 @@ class RedditAPI
             // Cache the rate-limit headers here.
             if (!empty($this->rate_limit_headers)) {
                 $this->rate_limit_headers['updated_at'] = time();
-                $this->cache_service->put('reddit_api_rate_limit_headers', $this->rate_limit_headers, 60 * 60 * 24);
+                $this->cache_service->put($this->rate_limit_headers_cache_key, $this->rate_limit_headers, 60 * 60 * 24);
             }
 
             //Parse response
