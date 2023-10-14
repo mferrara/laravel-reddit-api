@@ -27,7 +27,7 @@ class RedditOAuth2
         $this->app_secret = $app_secret;
         $this->user_agent = $user_agent;
         $this->endpoint = $endpoint;
-        $this->cache_key = 'reddit_access_token_'.$this->app_id;
+        $this->cache_key = 'reddit_access_token_1_'.$this->app_id;
         $this->cache_service = null;
         if($cache_auth_token)
             $this->cache_service = \Cache::driver($cache_driver);
@@ -68,10 +68,10 @@ class RedditOAuth2
     {
         $url = "{$this->endpoint}/api/v1/access_token";
         $params = array(
-            //'grant_type' => 'password',
-            //'username' => $this->username,
-            //'password' => $this->password,
-            'grant_type' => 'client_credentials',
+            'grant_type' => 'password',
+            'username' => $this->username,
+            'password' => $this->password,
+            //'grant_type' => 'client_credentials',
         );
         $options[CURLOPT_USERAGENT] = $this->user_agent;
         $options[CURLOPT_USERPWD] = $this->app_id . ':' . $this->app_secret;
@@ -90,6 +90,7 @@ class RedditOAuth2
             curl_setopt_array($ch, $options);
             $response_raw = curl_exec($ch);
             $response = json_decode($response_raw);
+            print_r($response);
             curl_close($ch);
             if (isset($response->access_token)) {
                 $got_token = true;
