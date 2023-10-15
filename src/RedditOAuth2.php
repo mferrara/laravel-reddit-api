@@ -18,8 +18,9 @@ class RedditOAuth2
     private $endpoint;
     private $cache_service;
     private $cache_key;
+    private $grant_type;
 
-    public function __construct($username, $password, $app_id, $app_secret, $user_agent, $endpoint, $cache_auth_token = true, $cache_driver = 'file')
+    public function __construct($username, $password, $app_id, $app_secret, $user_agent, $endpoint, $grant_type, $cache_auth_token = true, $cache_driver = 'file')
     {
         $this->username = $username;
         $this->password = $password;
@@ -27,11 +28,11 @@ class RedditOAuth2
         $this->app_secret = $app_secret;
         $this->user_agent = $user_agent;
         $this->endpoint = $endpoint;
-        $this->cache_key = 'reddit_access_token_1_'.$this->app_id;
+        $this->cache_key = 'reddit_access_token_1_'.$this->app_id.time();
         $this->cache_service = null;
         if($cache_auth_token)
             $this->cache_service = \Cache::driver($cache_driver);
-
+        $this->grant_type = $grant_type;
         // We're already making a call to getAccessToken on every apiCall, so we don't need to do it here
         //$this->requestAccessToken();
     }
@@ -67,12 +68,21 @@ class RedditOAuth2
     private function requestAccessToken()
     {
         $url = "{$this->endpoint}/api/v1/access_token";
-        $params = array(
-            'grant_type' => 'password',
-            'username' => $this->username,
-            'password' => $this->password,
-            //'grant_type' => 'client_credentials',
-        );
+
+        $params = [];
+        // We can't use the password grant type with apps that aren't 'script' type apps
+        // Using this method is best, currently, because for some reason we're getting 403 unauthorized errors when using the client_credentials grant type and requesting subreddit moderators
+        if($this->grant_type === 'password'){
+            $params['grant_type'] = 'password';
+            $params['username'] = $this->username;
+            $params['password'] = $this->password;
+        }elseif($this->grant_type === 'client_credentials')
+        {
+            $params['grant_type'] = 'client_credentials';
+        }else{
+            throw new RedditAuthenticationException("Invalid grant type supplied to RedditOAuth2::requestAccessToken: {$this->grant_type}");
+        }
+
         $options[CURLOPT_USERAGENT] = $this->user_agent;
         $options[CURLOPT_USERPWD] = $this->app_id . ':' . $this->app_secret;
         $options[CURLOPT_RETURNTRANSFER] = true;
@@ -90,11 +100,13 @@ class RedditOAuth2
             curl_setopt_array($ch, $options);
             $response_raw = curl_exec($ch);
             $response = json_decode($response_raw);
-            print_r($response);
             curl_close($ch);
             if (isset($response->access_token)) {
                 $got_token = true;
             } else {
+
+                \Log::debug("Failed to get reddit access token, response: $response_raw");
+
                 if (isset($response->error)) {
                     if ($response->error === "invalid_grant") {
                         throw new RedditAuthenticationException("Supplied reddit username/password are invalid or the threshold for invalid logins has been exceeded.", 1);

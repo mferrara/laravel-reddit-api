@@ -33,6 +33,7 @@ class RedditAPIServiceProvider extends ServiceProvider
                 $redditAPIConfig['app_secret'],
                 $redditAPIConfig['endpoint_standard'],
                 $redditAPIConfig['endpoint_oauth'],
+                $redditAPIConfig['grant_type'],
                 $redditAPIConfig['response_format'],
                 $redditAPIConfig['user_agent'],
                 $redditAPIConfig['cache_auth_token'],

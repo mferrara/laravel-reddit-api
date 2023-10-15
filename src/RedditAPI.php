@@ -22,9 +22,9 @@ class RedditAPI
     protected array $rate_limit_headers;
     private string $rate_limit_headers_cache_key;
 
-    public function __construct(string $username, string $password, string $appID, string $appSecret, string $endpointStandard, string $endpointOAuth, string $responseFormat, string $userAgent, bool $cacheAuthToken, string $cacheDriver, bool $rateLimited, bool $cacheRateLimitingHeaders)
+    public function __construct(string $username, string $password, string $appID, string $appSecret, string $endpointStandard, string $endpointOAuth, string $grantType, string $responseFormat, string $userAgent, bool $cacheAuthToken, string $cacheDriver, bool $rateLimited, bool $cacheRateLimitingHeaders)
     {
-        $this->oauth2 = new RedditOAuth2($username, $password, $appID, $appSecret, $userAgent, $endpointStandard, $cacheAuthToken, $cacheDriver);
+        $this->oauth2 = new RedditOAuth2($username, $password, $appID, $appSecret, $userAgent, $endpointStandard, $grantType, $cacheAuthToken, $cacheDriver);
         $this->ratelimiter = new RedditRateLimiter($rateLimited, 0.6);
         $this->user_agent = $userAgent;
         $this->basic_endpoint = $endpointStandard;

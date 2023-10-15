@@ -8,6 +8,7 @@ return [
     'password' => '',
     'app_id' => '',
     'app_secret' => '',
+    'grant_type' => '', // 'password' or 'authorization_code'
     'user_agent' => '(CodeWizz 0.1)',
     'response_format' => 'STD', // STD | ARRAY
 
@@ -16,6 +17,7 @@ return [
     'oauth_scopes' => ['identity', 'mysubreddits', 'read'],
     'oauth_app_id' => '',
     'oauth_app_secret' => '',
+    'oauth_grant_type' => '', // 'client_credentials' or 'refresh_token'
     'redirect_uri' => '',
 
     'rate_limited' => true,
