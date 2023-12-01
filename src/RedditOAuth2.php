@@ -28,10 +28,10 @@ class RedditOAuth2
         $this->app_secret = $app_secret;
         $this->user_agent = $user_agent;
         $this->endpoint = $endpoint;
-        $this->cache_key = 'reddit_access_token_1_'.$this->app_id.time();
+        $this->cache_key = 'reddit_access_token_'.$this->app_id;
         $this->cache_service = null;
         if($cache_auth_token)
-            $this->cache_service = \Cache::driver($cache_driver);
+            $this->cache_service = \Cache::store($cache_driver);
         $this->grant_type = $grant_type;
         // We're already making a call to getAccessToken on every apiCall, so we don't need to do it here
         //$this->requestAccessToken();
