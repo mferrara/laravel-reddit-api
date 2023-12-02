@@ -140,8 +140,7 @@ class RedditAPI
             'limit' => $limit,
             'show' => 'all'
         );
-        $response = $this->apiCall("/r/$subreddit/api/flairlist.json", 'GET', $params);
-        return $response;
+        return $this->apiCall("/r/$subreddit/api/flairlist.json", 'GET', $params);
     }
 
     /**
@@ -762,11 +761,7 @@ class RedditAPI
             'show' => 'all'
         );
         $api_sr = ($subreddit) ? "/r/$subreddit" : "";
-        $response = $this->apiCall("$api_sr/$listing.json", 'GET', $params);
-        if (isset($response->error)) {
-            return null;
-        }
-        return $response;
+        return $this->apiCall("$api_sr/$listing.json", 'GET', $params);
     }
 
     /**
