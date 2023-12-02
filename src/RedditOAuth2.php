@@ -136,7 +136,7 @@ class RedditOAuth2
                 'token_type' => $this->token_type,
                 'expiration' => $this->expiration,
                 'scope' => $this->scope,
-            ], 60 * 60 * 24 * 14); // 14 days
+            ], 60 * 5); // 5 min
         }
     }
 }
