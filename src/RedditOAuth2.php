@@ -28,7 +28,9 @@ class RedditOAuth2
         $this->app_secret = $app_secret;
         $this->user_agent = $user_agent;
         $this->endpoint = $endpoint;
-        $this->cache_key = 'reddit_access_token_'.$this->app_id;
+        // Add some variance to the cache key so we're forced to get a new token every hour at minimum
+        // This is merely a temporary solution to the problem of getting stuck where we've stored a bad token
+        $this->cache_key = 'reddit_access_token_'.$this->app_id.'_'.date('G');
         $this->cache_service = null;
         if($cache_auth_token)
             $this->cache_service = \Cache::store($cache_driver);
