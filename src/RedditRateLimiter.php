@@ -12,7 +12,7 @@ class RedditRateLimiter
     {
         $this->enabled = $enabled;
         $this->interval = $interval;
-        $this->last_request = microtime(true) * 10000;
+        $this->last_request = round(microtime(true) * 10000);
     }
 
     /**
@@ -48,11 +48,11 @@ class RedditRateLimiter
      */
     public function wait()
     {
-        $now = microtime(true) * 10000;
+        $now = round(microtime(true) * 10000);
         $wait_until = $this->last_request + ($this->interval * 10000);
         if ($this->enabled && $now < $wait_until) {
             usleep(($wait_until - $now) * 100);
         }
-        $this->last_request = microtime(true) * 10000;
+        $this->last_request = round(microtime(true) * 10000);
     }
 }
